@@ -1,0 +1,39 @@
+import folium
+import pandas as pd
+import numpy as np
+data = [
+    {"name": "Đường Cộng Hòa", "coords": [[10.801, 106.650], [10.806, 106.660]], "score": 0.9},
+    {"name": "Đường Nam Kỳ Khởi Nghĩa", "coords": [[10.785, 106.690], [10.775, 106.700]], "score": 0.4},
+    {"name": "Đường Xô Viết Nghệ Tĩnh", "coords": [[10.800, 106.710], [10.810, 106.715]], "score": 0.85},
+    {"name": "Đường Điện Biên Phủ", "coords": [[10.792, 106.685], [10.802, 106.705]], "score": 0.6},
+]
+def get_risk_color(score):
+    if score > 0.8: return "red"
+    if score > 0.5: return "orange"
+    return "green"                  
+m = folium.Map(location=[10.7769, 106.7009], zoom_start=13)
+for road in data:
+    color = get_risk_color(road['score'])
+    folium.PolyLine(
+        locations=road['coords'],
+        color=color,
+        weight=8,
+        opacity=0.8,
+        popup=f"{road['name']}: {road['score']*100}% Tắc nghẽn"
+    ).add_to(m)
+alt_route = [[10.801, 106.650], [10.810, 106.655], [10.815, 106.670]]
+folium.PolyLine(
+    locations=alt_route,
+    color="blue",
+    weight=5,
+    dash_array='10',
+    popup="Tuyến đường thay thế đề xuất"
+).add_to(m)
+
+folium.Marker(
+    [10.815, 106.670], 
+    popup="Điểm đến an toàn",
+    icon=folium.Icon(color='blue', icon='check')
+).add_to(m)
+
+m
