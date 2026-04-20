@@ -1,0 +1,14 @@
+  import folium
+from folium.plugins import HeatMap
+import numpy as np
+
+m = folium.Map(location=[10.7769, 106.7009], zoom_start=13)
+
+# Giả lập dữ liệu mật độ đơn hàng tập trung tại 2 "điểm nóng" (Hotspots)
+data = (np.random.normal(size=(100, 2)) * 0.01) + [10.7769, 106.7009]
+data2 = (np.random.normal(size=(50, 2)) * 0.005) + [10.7900, 106.7100]
+heat_data = np.vstack([data, data2]).tolist()
+
+HeatMap(heat_data).add_to(m)
+plt_title = "Dự báo điểm nóng gọi xe lúc 19:00"
+mn
