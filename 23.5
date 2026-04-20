@@ -1,0 +1,24 @@
+import pandas as pd
+import folium
+center_lat, center_lon = 10.7770, 106.6953 
+m = folium.Map(location=[center_lat, center_lon], zoom_start=13, control_scale=True)
+service_zones = [
+    {"radius": 3000, "color": "#2ecc71", "label": "Vùng 1: Nội thành ưu tiên (3km)"},
+    {"radius": 5000, "color": "#f39c12", "label": "Vùng 2: Nội thành mở rộng (5km)"},
+    {"radius": 10000, "color": "#e74c3c", "label": "Vùng 3: Vùng ngoại vi (10km)"}
+]
+for zone in service_zones:
+    folium.Circle(
+        location=[center_lat, center_lon],
+        radius=zone['radius'],
+        color=zone['color'],
+        fill=True,
+        fill_opacity=0.15,
+        popup=zone['label']
+    ).add_to(m)
+folium.Marker(
+    [center_lat, center_lon], 
+    popup="<b>Tổng kho TP.HCM</b>",
+    icon=folium.Icon(color='blue',tooltip="Click vào", icon="home")
+).add_to(m)
+m
