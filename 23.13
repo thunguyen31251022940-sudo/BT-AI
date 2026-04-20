@@ -1,0 +1,16 @@
+import folium
+from folium import plugins
+m = folium.Map(location=[10.7769, 106.7009], zoom_start=13)
+fg_points = folium.FeatureGroup(name="Kho hàng & Trạm")
+folium.Marker([10.7769, 106.7009], popup="Kho tổng Quận 1", icon=folium.Icon(color='red')).add_to(fg_points)
+fg_points.add_to(m)
+fg_zones = folium.FeatureGroup(name="Vùng phục vụ")
+folium.Circle([10.7769, 106.7009], radius=3000, color='green', fill=True, opacity=0.2).add_to(fg_zones)
+fg_zones.add_to(m)
+fg_routes = folium.FeatureGroup(name="Tuyến đường vận chuyển")
+folium.PolyLine([[10.7769, 106.7009], [10.8000, 106.7100], [10.8100, 106.7200]], color='blue', weight=5).add_to(fg_routes)
+fg_routes.add_to(m)
+folium.LayerControl().add_to(m)
+plugins.Fullscreen().add_to(m)
+
+m
