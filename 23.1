@@ -1,0 +1,16 @@
+import folium
+m = folium.Map(location=[10.7828, 106.6946], zoom_start=15)
+fg_ueh = folium.FeatureGroup(name="Trường Đại học").add_to(m)
+fg_places = folium.FeatureGroup(name="Địa điểm lân cận").add_to(m)
+folium.Marker([10.7828, 106.6946], popup="UEH Cơ sở A", tooltip="Click vào", icon=folium.Icon(color='red')).add_to(fg_ueh)
+places = [
+    ([10.7795, 106.6921], "Bảo tàng Chứng tích Chiến tranh", "Bảo tàng lịch sử"),
+    ([10.7812, 106.6979], "Diamond Plaza", "Trung tâm thương mại"),
+    ([10.7770, 106.6953], "Dinh Độc Lập", "Cơ quan hành chính / Di tích"),
+    ([10.7828, 106.6958], "Hồ Con Rùa", "Khu công cộng"),
+    ([10.7562, 106.6666], "Bệnh viện đại học Y Dược", "Bệnh viện")
+]
+for coords, name, desc in places:
+    folium.Marker(coords, popup=f"<b>{name}</b><br>{desc}", tooltip="Click vào").add_to(fg_places)
+folium.LayerControl().add_to(m)
+m
