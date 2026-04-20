@@ -1,0 +1,37 @@
+import pandas as pd
+import numpy as np
+import folium
+from folium.plugins import HeatMap
+from sklearn.ensemble import RandomForestRegressor
+np.random.seed(42)
+n_samples = 1000
+train_data = {
+    'lat': 10.72 + np.random.rand(n_samples) * 0.1,
+    'lon': 106.62 + np.random.rand(n_samples) * 0.1,
+    'hour': np.random.randint(0, 24, n_samples),
+    'demand': np.random.randint(10, 100, n_samples)
+}
+df_train = pd.DataFrame(train_data)
+X = df_train[['lat', 'lon', 'hour']]
+y = df_train['demand']
+model = RandomForestRegressor(n_estimators=50, random_state=42)
+model.fit(X, y)
+predict_hour = 18
+lat_grid = np.linspace(10.72, 10.82, 30)
+lon_grid = np.linspace(10.62, 10.72, 30)
+grid_points = [(lat, lon, predict_hour) for lat in lat_grid for lon in lon_grid]
+df_predict = pd.DataFrame(grid_points, columns=['lat', 'lon', 'hour'])
+df_predict['predicted_demand'] = model.predict(df_predict)
+m = folium.Map(location=[10.7769, 106.67], zoom_start=12)
+heat_data = df_predict[['lat', 'lon', 'predicted_demand']].values.tolist()
+HeatMap(
+    data=heat_data,
+    radius=20,       
+    blur=15,             
+    min_opacity=0.3,     
+    max_val=float(df_predict['predicted_demand'].max()),
+    gradient={0.4: 'blue', 0.65: 'lime', 1: 'red'}
+).add_to(m)
+folium.Marker([10.7769, 106.67], popup=f"Dự báo nhu cầu {predict_hour}h").add_to(m)
+
+m
