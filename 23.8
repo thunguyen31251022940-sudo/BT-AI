@@ -1,0 +1,36 @@
+import folium
+import pandas as pd
+import numpy as np
+from scipy.spatial import distance
+center_lat, center_lon = 10.7769, 106.7009
+customer_loc = [center_lat + np.random.uniform(-0.01, 0.01), 
+                center_lon + np.random.uniform(-0.01, 0.01)]
+num_drivers = 5
+drivers_lat = center_lat + np.random.uniform(-0.02, 0.02, num_drivers)
+drivers_lon = center_lon + np.random.uniform(-0.02, 0.02, num_drivers)
+drivers_locs = np.column_stack((drivers_lat, drivers_lon))
+distances = distance.cdist([customer_loc], drivers_locs, 'euclidean')[0]
+closest_driver_idx = np.argmin(distances)
+closest_driver_loc = drivers_locs[closest_driver_idx]
+m = folium.Map(location=[center_lat, center_lon], zoom_start=15)
+folium.Marker(
+    location=customer_loc,
+    popup="Khách hàng",
+    icon=folium.Icon(color='red', icon='user')
+).add_to(m)
+for i, loc in enumerate(drivers_locs):
+    color = 'green' if i == closest_driver_idx else 'blue'
+    status = "ĐƯỢC CHỌN (Gần nhất)" if i == closest_driver_idx else f"Tài xế {i+1}"
+    
+    folium.Marker(
+        location=loc,
+        popup=status,
+        icon=folium.Icon(color=color, icon='car', prefix='fa')
+    ).add_to(m)
+folium.PolyLine(
+    locations=[customer_loc, closest_driver_loc],
+    color='black',
+    dash_array='10',
+    label='Đường ghép xe'
+).add_to(m)
+m
