@@ -1,0 +1,17 @@
+import folium
+import time
+from IPython.display import display, clear_output
+m = folium.Map([10.78, 106.70], zoom_start=14)
+xe = [10.78, 106.70]
+dich = [[10.775,106.695], [10.785,106.705], [10.770,106.688]]
+car = folium.Marker(xe, popup='Xe', icon=folium.Icon(color='blue', icon='car')).add_to(m)
+for d in dich:
+    folium.Marker(d, popup='Điểm đến', icon=folium.Icon(color='green')).add_to(m)
+for target in dich:
+    for step in range(10):
+        xe[0] += (target[0] - xe[0]) * 0.3
+        xe[1] += (target[1] - xe[1]) * 0.3
+        car.location = xe
+        clear_output(wait=True)
+        display(m)
+display(m)
