@@ -1,0 +1,40 @@
+import folium
+from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
+import time
+geolocator = Nominatim(user_agent="ueh_mapping_assignment")
+UEH_A= (10.7828, 106.6946)
+m = folium.Map(location=UEH_A, zoom_start=16)
+folium.Marker(
+    UEH_A,
+    popup="TRUNG TÂM: UEH",
+    icon=folium.Icon(color="red")
+).add_to(m)
+addresses = [
+   "Chợ Bến Thành, Quận 1, TP.HCM",
+    "Dinh Độc Lập, TP.HCM",
+    "Bảo tàng Chứng tích Chiến tranh, TP.HCM",
+    "Thảo Cầm Viên Sài Gòn, TP.HCM",
+    "Sân bay Tân Sơn Nhất, TP.HCM",
+    "Nhà hát Thành phố, TP.HCM",
+    "Tòa nhà Bitexco, TP.HCM",
+    "Landmark 81, TP.HCM",
+    "Chợ Bình Tây, TP.HCM",
+    "Khu du lịch Suối Tiên, TP.HCM"
+]
+for addr in addresses:
+    try:
+        location = geolocator.geocode(addr)
+        if location:
+            point_coords = (location.latitude, location.longitude)
+            distance_km = geodesic(UEH_A, point_coords).kilometers
+            short_name = addr.split(',')[0]
+            folium.Marker(
+                point_coords,
+                popup=f"<b>{short_name}</b><br>Cách trung tâm: {distance_km:.2f} km",
+                tooltip=f"Click xem khoảng cách tới {short_name}"
+            ).add_to(m)
+        time.sleep(1)
+    except Exception as e:
+        pass
+m
