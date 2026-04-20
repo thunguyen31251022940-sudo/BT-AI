@@ -1,0 +1,53 @@
+import pandas as pd
+import numpy as np
+import folium
+from folium.plugins import HeatMap
+from sklearn.ensemble import RandomForestRegressor
+
+# 1. TẠO DỮ LIỆU GIẢ LẬP (Đảm bảo có sự chênh lệch rõ rệt để Heatmap hiện màu)
+np.random.seed(42)
+n_samples = 1000
+train_data = {
+    'lat': 10.72 + np.random.rand(n_samples) * 0.1,
+    'lon': 106.62 + np.random.rand(n_samples) * 0.1,
+    'hour': np.random.randint(0, 24, n_samples),
+    'demand': np.random.randint(10, 100, n_samples)
+}
+df_train = pd.DataFrame(train_data)
+
+# 2. HUẤN LUYỆN MÔ HÌNH
+X = df_train[['lat', 'lon', 'hour']]
+y = df_train['demand']
+model = RandomForestRegressor(n_estimators=50, random_state=42)
+model.fit(X, y)
+
+# 3. DỰ ĐOÁN CHO KHUNG GIỜ CAO ĐIỂM
+predict_hour = 18
+# Tạo lưới điểm dày hơn (30x30) để HeatMap trông mượt hơn
+lat_grid = np.linspace(10.72, 10.82, 30)
+lon_grid = np.linspace(10.62, 10.72, 30)
+grid_points = [(lat, lon, predict_hour) for lat in lat_grid for lon in lon_grid]
+df_predict = pd.DataFrame(grid_points, columns=['lat', 'lon', 'hour'])
+df_predict['predicted_demand'] = model.predict(df_predict)
+
+# 4. TRỰC QUAN HÓA (Quan trọng nhất phần này)
+m = folium.Map(location=[10.7769, 106.67], zoom_start=12)
+
+# Chuẩn bị dữ liệu HeatMap: [lat, lon, weight]
+# Chúng ta sẽ scale demand lên để màu sắc hiện rõ hơn
+heat_data = df_predict[['lat', 'lon', 'predicted_demand']].values.tolist()
+
+# Thêm HeatMap vào bản đồ với các thông số tối ưu
+HeatMap(
+    data=heat_data,
+    radius=20,           # Tăng bán kính điểm nhiệt
+    blur=15,             # Độ nhòe
+    min_opacity=0.3,     # Độ mờ tối thiểu (để không bị biến mất)
+    max_val=float(df_predict['predicted_demand'].max()), # Đặt ngưỡng cao nhất
+    gradient={0.4: 'blue', 0.65: 'lime', 1: 'red'} # Định nghĩa màu rõ rệt
+).add_to(m)
+
+# Thêm chú thích
+folium.Marker([10.7769, 106.67], popup=f"Dự báo nhu cầu {predict_hour}h").add_to(m)
+
+m
