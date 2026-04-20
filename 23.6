@@ -1,0 +1,16 @@
+import osmnx as ox
+ox.settings.log_console = True
+#khai báo khu vực phân tích
+place = "District 1, Ho Chi Minh City, Vietnam" 
+Go = ox.graph_from_place(place, network_type='drive')
+print("Đã tải xong dữ liệu mạng lưới giao thông!")
+#fig, ax = ox.plot_graph(Go)
+stats = ox.basic_stats(Go)
+nut_giao = stats['intersection_count']
+chieu_dai_tb = stats['street_length_avg']
+gdf = ox.geocode_to_gdf(place)
+skm = gdf.to_crs('+proj=cea').area.iloc[0] / 1e6
+mat_do = nut_giao /skm
+print(f"Số nút giao: {nut_giao}")
+print(f"Chiều dài đường TB: {chieu_dai_tb:.2f} mét")
+print(f"Mật độ mạng (nút giao): {mat_do:.0f} nút/km2")
